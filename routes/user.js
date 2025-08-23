@@ -8,7 +8,7 @@ userRouter.post('/signup', async function(req,res) {
     const {email, password, firstName, lastName } = req.body;
 
     try {
-        const user = await userModel.create({
+          await userModel.create({
             email: email,
             password: password,
             firstName: firstName,
