@@ -1,7 +1,11 @@
 const { Router } = require("express");
-const { userModel } = require("../db");
+const { userModel, purchaseModel } = require("../db");
+const jwt = require('jsonwebtoken');
+const {JWT_USER_PASSWORD} = ("../config");
 
 const userRouter = Router();
+
+
 
 
 userRouter.post('/signup', async function(req,res) {
@@ -16,7 +20,7 @@ userRouter.post('/signup', async function(req,res) {
         })
 
         res.json({
-            message: "signup endpoint"
+            message: "signup successful"
         }) 
     } catch(error) {
         res.status(500).json({
@@ -26,15 +30,42 @@ userRouter.post('/signup', async function(req,res) {
     }
 })
 
-userRouter.post('/signin', function(req,res) {
-    res.json({
-        message:"signin endpoint"
+userRouter.post('/signin', async function(req,res) {
+    const {email, password} = req.body;
+
+    const user = await userModel.findOne({
+        email: email,
+        password: password
     })
+    if(user) {
+        const token = jwt.sign({
+            id: user._id,
+        }, JWT_USER_PASSWORD);
+
+        res.json({
+            token: token
+        })
+    } else {
+        res.status(403).json({
+            message: "Invalid credentials"
+        }) 
+    }
 })
 
-userRouter.get("/purchases", function(req,res) {
+userRouter.get("/purchases", userMiddleware,async function(req,res) {
+    const userId = req.userId;
+
+    const purchases = await purchaseModel.find({
+        userId,
+    })
+
+    const courseData = await courseModel.find({
+        _id: purchaseModel.applyTimestamps(x=> x.courseId)
+    })
+
     res.json({
-        message: "purchases endpoint"
+        purchases,
+        courseData
     })
 })
 

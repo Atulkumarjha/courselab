@@ -8,9 +8,9 @@ const mongoose = require("mongoose");
 
 app.use(express.json());
 
-app.use("/user", userRouter);
-app.use("/course", courseRouter);
-app.use('/admin',adminRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/course", courseRouter);
+app.use('/api/v1/admin',adminRouter);
 
 async function main() {
     await mongoose.connect("mongodb+srv://courselab:courselab@courselab.vjczqhe.mongodb.net/atul-course-lab");
@@ -19,4 +19,4 @@ async function main() {
 });
 }
 
-main()
+main() 
